@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <msclr\marshal_cppstd.h>
 #include <algorithm>
+#include "Traanslator.h"
 
 #pragma once
 
@@ -14,10 +15,7 @@ namespace Morse {
 	using namespace System::Data;
 	using namespace System::Drawing;
 	using namespace std;
-
-	std::string EngAlphabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '.', ',' };
-	std::string MorseAlphabet[30] = { ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--..", ".-.-.-", "--..--" };
-
+	
 	/// <summary>
 	/// Сводка для MainForm
 	/// </summary>
@@ -190,10 +188,9 @@ namespace Morse {
 	
 	private: System::Void TxtToMorseButton_Click(System::Object^  sender, System::EventArgs^  e) {
 		
-		msclr::interop::marshal_context context;
-
+		msclr::interop::marshal_context context;	
 		std::string InputText = context.marshal_as<std::string>(TxtBox->Text);
-		std::string MorseCode = TranslateToMorse(InputText);
+		std::string MorseCode = Traanslator::toMorse(InputText);
 		MorseBox->Text = gcnew String(MorseCode.c_str());				
 	}
 
@@ -202,48 +199,8 @@ namespace Morse {
 		msclr::interop::marshal_context context;
 		
 		std::string MorseCode = context.marshal_as<std::string>(MorseBox->Text);
-		std::string Text = TranslateToText(MorseCode);
+		std::string Text = Traanslator::toText(MorseCode);
 		TxtBox->Text = gcnew String(Text.c_str());
-	}
-
-	private: std::string TranslateToMorse(std::string Text)
-	{
-		std::string Morse;		
-
-		std::transform(Text.begin(), Text.end(), Text.begin(), ::toupper);
-		for (unsigned i = 0; i < Text.length(); ++i)
-		{
-			for (int counter = 0; counter < 30; counter++)
-			{
-				if (Text.at(i) == EngAlphabet[counter])
-				{
-					Morse += MorseAlphabet[counter] + ' ';
-					break;
-				}
-			}
-		}
-		return Morse;
-	}
-
-	private: std::string TranslateToText(std::string Morse)
-	{
-		std::string Text;	
-
-		for (unsigned i = 0; i < Morse.length(); ++i)
-		{
-			std::string token = Morse.substr(i, Morse.find(' '));
-			token = token.substr(0, token.find(' '));
-			for (int counter = 0; counter < 30; counter++)
-			{
-				if (token == MorseAlphabet[counter])
-				{
-					Text += EngAlphabet[counter];
-					i += token.length();
-					break;
-				}
-			}
-		}
-		return Text;
-	}
+	}	
 };
 }
